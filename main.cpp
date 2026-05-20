@@ -36,8 +36,6 @@ struct Array3D
     }
 };
 
-void add (double* a, double b) { *a += b; }
-
 void smoother (Array3D<double> const& phi, Array3D<double> const& rhs,
                Array3D<double> const& sig, double dx, double dy, double dz)
 {
@@ -92,7 +90,7 @@ void smoother (Array3D<double> const& phi, Array3D<double> const& rhs,
 
 template <typename fty> fty *__raptor_truncate_op_func(fty *, int, int, int);
 
-int main (int argc, char* argv[])
+void test_smoother ()
 {
     int nx = 128;
     int ny = 128;
@@ -116,6 +114,13 @@ int main (int argc, char* argv[])
 
     auto smoother_wrapper = __raptor_truncate_op_func(smoother, 64, 0, 32);
     smoother_wrapper(phi_a, rhs_a, sig_a, dx, dy, dz);
+}
+
+void add (double* a, double b) { *a += b; }
+
+void test_add ()
+{
+    double dx = 1./128.;
 
     std::cout << std::setprecision(17) << "dx = " << dx << '\n';
 
@@ -127,6 +132,13 @@ int main (int argc, char* argv[])
     add(&dx, 1.e-9);
 
     std::cout << "dx = " << dx << '\n';
+}
+
+int main (int argc, char* argv[])
+{
+    test_smoother();
+
+    test_add();
 
     return 0;
 }
