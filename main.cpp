@@ -1,6 +1,7 @@
 
 #include <iomanip>
 #include <iostream>
+#include <limits>
 #include <vector>
 
 template <typename T>
@@ -89,6 +90,7 @@ void smoother (Array3D<double> const& phi, Array3D<double> const& rhs,
 }
 
 template <typename fty> fty *__raptor_truncate_op_func(fty *, int, int, int);
+template <typename fty> fty *__raptor_truncate_op_func(fty *, int, int, int, int);
 
 void test_smoother ()
 {
@@ -120,18 +122,19 @@ void add (double* a, double b) { *a += b; }
 
 void test_add ()
 {
-    double dx = 1./128.;
+    double x = 1.;
+    double eps = std::numeric_limits<float>::epsilon() * 0.5;
 
-    std::cout << std::setprecision(17) << "dx = " << dx << '\n';
+    auto add_wrapper = __raptor_truncate_op_func(add, 64, 0, 32);
 
-    auto add_wrapper = __raptor_truncate_op_func(add, 64, 0, 16);
-    add_wrapper(&dx, 1.e-9);
+    add_wrapper(&x, eps);
+    std::cout << std::setprecision(17);
+    std::cout << " raptor: 1 + " << eps << " = " << x << '\n';
+    std::cout << " float : 1 + " << eps << " = " << double(1.f + float(eps)) << '\n';
 
-    std::cout << "dx = " << dx << '\n';
-
-    add(&dx, 1.e-9);
-
-    std::cout << "dx = " << dx << '\n';
+    x = 1.;
+    add(&x, eps);
+    std::cout << " double: 1 + " << eps << " = " << x << '\n';
 }
 
 int main (int argc, char* argv[])
